@@ -11,6 +11,8 @@ class ExampleTest extends TestCase
      */
     public function test_home_page_is_accessible(): void
     {
+        $this->withoutVite();
+
         $response = $this->get('/');
 
         $response->assertStatus(200);
@@ -21,6 +23,8 @@ class ExampleTest extends TestCase
      */
     public function test_device_page_is_accessible(): void
     {
+        $this->withoutVite();
+
         $response = $this->get('/device');
 
         $response->assertStatus(200);
@@ -31,6 +35,8 @@ class ExampleTest extends TestCase
      */
     public function test_listgame_page_is_accessible(): void
     {
+        $this->withoutVite();
+
         $response = $this->get('/listgame');
 
         $response->assertStatus(200);
