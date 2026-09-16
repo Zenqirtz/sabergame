@@ -1,306 +1,374 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- CSRF token untuk proteksi request AJAX ke Laravel -->
   <meta name="csrf-token" content="{{ csrf_token() }}">
-  <title>SABER BOT</title>
+  <title>Cibel - Saber Game Bot</title>
   <style>
-    /* Reset dan styling dasar */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: Arial, sans-serif;
-    }
-    body, html {
-      height: 100%;
-      background: #fff;
+      font-family: 'Inter', Arial, sans-serif;
     }
 
-    /* Kontainer utama chatbot */
+    body, html {
+      height: 100%;
+      background: #f7f7f7;
+    }
+
+    /* Container utama */
     .chat-container {
       display: flex;
       flex-direction: column;
       height: 100vh;
-      max-width: 420px;
-      margin: 0 auto;
-      border: 1px solid #eee;
-      border-radius: 20px;
+      background: #ffffff;
+      border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
     }
 
     /* Header */
-    /* Header chatbot: judul + tombol tutup */
     .chat-header {
-      background: linear-gradient(180deg, #8B0000 0%, #9b0000 100%);
+      background: linear-gradient(135deg, #8B0000 0%, #c40909 100%);
       color: white;
       display: flex;
       align-items: center;
-      padding: 10px 15px;
+      padding: 12px 16px;
+      gap: 10px;
       position: relative;
-      user-select: none;
+      flex-shrink: 0;
     }
-    .chat-header img {
-      background: linear-gradient(180deg, #8B0000 0%, #9b0000 100%);
-      border-radius: 50%;
+
+    .chat-header-avatar {
       width: 40px;
       height: 40px;
-      margin-right: 10px;
-      padding: 5px;
-    }
-    .chat-header .title {
-      font-weight: bold;
-      font-size: 1.1em;
-      flex-grow: 1;
-    }
-    .chat-header .close-btn { display: none; }
-    .status-dot { width: 10px; height: 10px; background: #32CD32; border: 2px solid #fff; border-radius: 50%; margin-left: 8px; }
-
-    /* Messages area */
-    /* Area pesan: menampilkan bubble kiri (bot) dan kanan (user) */
-    .chat-messages {
-      flex-grow: 1;
-      padding: 15px;
-      overflow-y: auto;
-      background: #fff;
-      display: flex;
-      flex-direction: column;
-    }
-    .message {
-      max-width: 75%;
-      margin-bottom: 15px;
-      padding: 10px 15px;
-      border-radius: 15px;
-      font-size: 0.9em;
-      display: flex;
-      align-items: center;
-    }
-    /* Bubble kiri untuk balasan bot */
-    .message.left {
-      background-color: #8B0000;
-      color: white;
-      align-self: flex-start;
-      gap: 10px;
-    }
-    /* Bubble kanan untuk pesan user */
-    .message.right {
-      background-color: #ccc;
-      color: black;
-      align-self: flex-end;
-      gap: 10px;
-      justify-content: flex-end;
-      flex-direction: row-reverse;
-    }
-    .message img {
-      width: 30px;
-      height: 30px;
       border-radius: 50%;
       object-fit: cover;
-    }
-    .message p {
-      margin: 0;
-      line-height: 1.3;
-      word-wrap: break-word;
+      border: 2px solid rgba(255,255,255,0.4);
+      flex-shrink: 0;
     }
 
-    /* Form input section */
-    /* Form input: kolom teks + tombol kirim */
-    .chat-input {
-      padding: 15px;
-      background: #f0f0f0;
+    .chat-header-info {
+      flex: 1;
     }
+
+    .chat-header-name {
+      font-weight: 700;
+      font-size: 0.95rem;
+      line-height: 1.2;
+    }
+
+    .chat-header-status {
+      font-size: 0.72rem;
+      opacity: 0.85;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 2px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background: #4ade80;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255,255,255,0.6);
+      flex-shrink: 0;
+    }
+
+    /* Tombol tutup - kirim postMessage ke parent */
+    .close-btn {
+      background: rgba(255,255,255,0.18);
+      color: white;
+      border: 1.5px solid rgba(255,255,255,0.4);
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .close-btn:hover {
+      background: rgba(255,255,255,0.32);
+    }
+
+    /* Area pesan */
+    .chat-messages {
+      flex: 1;
+      padding: 16px 14px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      background: #fafafa;
+    }
+
+    .chat-messages::-webkit-scrollbar { width: 4px; }
+    .chat-messages::-webkit-scrollbar-thumb { background: #ddd; border-radius: 2px; }
+
+    /* Bubble pesan */
+    .message {
+      max-width: 78%;
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+    }
+
+    .message.left {
+      align-self: flex-start;
+    }
+
+    .message.right {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    .message-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .message-bubble {
+      padding: 10px 14px;
+      border-radius: 16px;
+      font-size: 0.875rem;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+
+    .message.left .message-bubble {
+      background: #8B0000;
+      color: #ffffff;
+      border-bottom-left-radius: 4px;
+    }
+
+    .message.right .message-bubble {
+      background: #e8e8e8;
+      color: #222;
+      border-bottom-right-radius: 4px;
+    }
+
+    /* Typing indicator */
+    .message.typing .message-bubble {
+      padding: 12px 18px;
+    }
+
+    .typing-dots {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .typing-dots span {
+      width: 7px;
+      height: 7px;
+      background: rgba(255,255,255,0.7);
+      border-radius: 50%;
+      animation: bounce 1.3s infinite ease-in-out;
+    }
+
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: scale(0.75); opacity: 0.5; }
+      40%            { transform: scale(1.1);  opacity: 1; }
+    }
+
+    /* Input area */
+    .chat-input {
+      padding: 12px 14px;
+      background: #fff;
+      border-top: 1px solid #eee;
+      flex-shrink: 0;
+    }
+
     .chat-input form {
       display: flex;
+      gap: 10px;
+      align-items: center;
     }
+
     .chat-input input[type="text"] {
       flex: 1;
-      padding: 12px 15px;
-      border-radius: 20px;
-      border: 1px solid #ccc;
-      font-size: 1em;
+      padding: 11px 16px;
+      border-radius: 24px;
+      border: 1.5px solid #e0e0e0;
+      font-size: 0.875rem;
       outline: none;
+      background: #f7f7f7;
+      transition: border-color 0.2s ease;
     }
-    .chat-input button {
-      background-color: #8B0000;
+
+    .chat-input input[type="text"]:focus {
+      border-color: #8B0000;
+      background: #fff;
+    }
+
+    .chat-input input[type="text"]::placeholder {
+      color: #bbb;
+    }
+
+    .chat-input button[type="submit"] {
+      background: linear-gradient(135deg, #8B0000, #c40909);
       border: none;
       color: white;
-      font-weight: bold;
-      padding: 0 20px;
-      margin-left: 10px;
-      border-radius: 20px;
+      font-weight: 700;
+      font-size: 13px;
+      padding: 11px 20px;
+      border-radius: 24px;
       cursor: pointer;
-      transition: background-color 0.3s ease;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      flex-shrink: 0;
+      white-space: nowrap;
     }
-    .chat-input button:hover {
-      background-color: #a00000;
+
+    .chat-input button[type="submit"]:hover:not(:disabled) {
+      opacity: 0.88;
+      transform: translateY(-1px);
     }
-  </style>
-  <style>
-    /* Penyesuaian tampilan bubble agar mendekati mockup */
-    .chat-messages { gap: 14px; }
-    .message.left { border-top-left-radius: 6px; }
-    .message.right { background-color: #bdbdbd; border-top-right-radius: 6px; }
-    .message.typing p { letter-spacing: 2px; }
+
+    .chat-input button[type="submit"]:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
   </style>
 </head>
 <body>
   <div class="chat-container">
     <!-- Header -->
     <div class="chat-header">
-      <img src="{{ asset('images/Cibelatas.png') }}" alt="Bot Avatar" />
-      <div class="title">Cibel</div><span class="status-dot" title="Online"></span>
-      <div class="close-btn" onclick="closeChat()">Close</div>
+      <img src="{{ asset('images/Cibelatas.png') }}" alt="Cibel Avatar" class="chat-header-avatar" />
+      <div class="chat-header-info">
+        <div class="chat-header-name">Cibel</div>
+        <div class="chat-header-status">
+          <span class="status-dot"></span> Online
+        </div>
+      </div>
+      <!-- Tutup chat via postMessage ke parent window -->
+      <button class="close-btn" id="close-btn">✕ Tutup</button>
     </div>
 
     <!-- Messages -->
-    <div class="chat-messages">
+    <div class="chat-messages" id="chat-messages">
       <div class="message left">
-        <img src="{{ asset('images/Cibel.png') }}" alt="Bot Avatar" />
-        <p>Halooww aku Cibel, ada yang bisa aku bantu?</p>
+        <img src="{{ asset('images/Cibel.png') }}" alt="Cibel" class="message-avatar" />
+        <div class="message-bubble">
+          Halooww aku Cibel 👋 Ada yang bisa aku bantu seputar Saber Game?
+        </div>
       </div>
     </div>
 
     <!-- Input Form -->
     <div class="chat-input">
       <form id="chat-form" autocomplete="off">
-        <input type="text" id="message" name="message" placeholder="Tanya Cibel...." required />
-        <button type="submit">Kirim</button>
+        <input type="text" id="message" name="message" placeholder="Tanya Cibel..." required />
+        <button type="submit" id="send-btn">Kirim</button>
       </form>
     </div>
   </div>
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
-    <script>
-  // Inisialisasi interaksi chatbot
-  $(document).ready(function() {
-    // Fungsi menutup chat (opsional)
-    // Handler tombol Close (opsional, karena kita pakai modal di Home)
-    function closeChat() {
-      alert('Fungsi Close Chat belum diimplementasikan.');
-    }
-    $('.close-btn').click(closeChat);
+  <script>
+    $(document).ready(function () {
 
-    // Fungsi escape HTML untuk keamanan pesan agar tidak menyebabkan XSS
-    // Sanitasi teks untuk mencegah XSS saat menampilkan pesan
-    function escapeHtml(text) {
-      return text.replace(/[&<>"']/g, function(m) {
-        return {
-          '&': '&amp;',
-          '<': '&lt;',
-          '>': '&gt;',
-          '"': '&quot;',
-          "'": '&#39;'
-        }[m];
-      });
-    }
-
-    // Scroll otomatis ke pesan terakhir
-    // Scroll ke pesan terbaru agar UI selalu fokus di bawah
-    function scrollToBottom() {
-      var chat = $('.chat-messages');
-      chat.scrollTop(chat[0].scrollHeight);
-    }
-
-    // Event submit form chat
-    // Saat user mengirim pesan: tampilkan bubble kanan lalu kirim ke backend
-    $('#chat-form').submit(function(event) {
-      event.preventDefault();
-
-      var input = $('#message');
-      var message = input.val().trim();
-      if (!message) return;
-
-      // Disable input & button saat pengiriman
-      input.prop('disabled', true);
-      $('#chat-form button').prop('disabled', true);
-
-      // Tampilkan pesan user (bubble kanan)
-      $('.chat-messages').append(
-        '<div class="message right">' +
-          '<p>' + escapeHtml(message) + '</p>' +
-        '</div>'
-      );
-      scrollToBottom();
-
-      // Kirim pesan ke backend API
-      // Kirim pesan ke endpoint Laravel, sertakan CSRF
-      $.ajax({
-        url: '/chat',
-        method: 'POST',
-        dataType: 'json',
-        headers: {
-          'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        },
-        data: { content: message },
-        beforeSend: function() {
-          $('.chat-messages').append(
-            '<div class="message left typing">' +
-              '<img src="{{ asset('images/Cibel.png') }}" alt="Bot Avatar" />' +
-              '<p>...</p>' +
-            '</div>'
-          );
-          scrollToBottom();
-        },
-        success: function(res) {
-          // Pastikan response ada properti message
-          if (res.message) {
-            // Hapus indikator mengetik lalu tampilkan balasan bot (bubble kiri)
-            $('.message.typing').remove();
-            $('.chat-messages').append(
-              '<div class="message left">' +
-                '<img src="{{ asset('images/Cibel.png') }}" alt="Bot Avatar" />' +
-                '<p>' + escapeHtml(res.message) + '</p>' +
-              '</div>'
-            );
-            scrollToBottom();
-          } else {
-            $('.message.typing').remove();
-            $('.chat-messages').append(
-              '<div class="message left">' +
-                '<img src="{{ asset('images/Cibel.png') }}" alt="Bot Avatar" />' +
-                '<p>Maaf, terjadi kesalahan pada format balasan.</p>' +
-              '</div>'
-            );
-            scrollToBottom();
-          }
-          // Enable input dan button kembali
-          input.val('');
-          input.prop('disabled', false);
-          $('#chat-form button').prop('disabled', false);
-          input.focus();
-        },
-        error: function(xhr, status, error) {
-          // Tampilkan pesan error ramah pengguna jika backend gagal
-          var msg = 'Maaf, terjadi kesalahan saat memproses permintaan.';
-          var detail = '';
-          try {
-            if (xhr.responseJSON) {
-              if (xhr.responseJSON.error) msg = xhr.responseJSON.error;
-              var d = xhr.responseJSON.details;
-              if (typeof d === 'string') {
-                detail = d;
-              } else if (d && d.error && d.error.message) {
-                detail = d.error.message;
-              }
-            }
-          } catch (e) {}
-          $('.message.typing').remove();
-          var html = '<div class="message left">' +
-              '<img src="{{ asset('images/Cibel.png') }}" alt="Bot Avatar" />' +
-              '<p>' + escapeHtml(msg + (detail ? ' (' + detail + ')' : '')) + '</p>' +
-            '</div>';
-          $('.chat-messages').append(html);
-          scrollToBottom();
-          input.prop('disabled', false);
-          $('#chat-form button').prop('disabled', false);
-          input.focus();
+      // ── Tutup chat: kirim postMessage ke parent window ──
+      $('#close-btn').on('click', function () {
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage('closeChat', '*');
         }
       });
+
+      // ── Sanitasi XSS ──
+      function escapeHtml(text) {
+        return String(text).replace(/[&<>"']/g, function (m) {
+          return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m];
+        });
+      }
+
+      // ── Scroll ke bawah ──
+      function scrollToBottom() {
+        var $msgs = $('#chat-messages');
+        $msgs.scrollTop($msgs[0].scrollHeight);
+      }
+
+      // ── Append bubble ──
+      function appendBubble(side, html, isTyping) {
+        var avatarSrc = '{{ asset("images/Cibel.png") }}';
+        var avatarHtml = side === 'left'
+          ? '<img src="' + avatarSrc + '" alt="Cibel" class="message-avatar" />'
+          : '';
+        var cls = 'message ' + side + (isTyping ? ' typing' : '');
+        var bubble = isTyping
+          ? '<div class="message-bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div>'
+          : '<div class="message-bubble">' + html + '</div>';
+
+        var row = side === 'left'
+          ? '<div class="' + cls + '">' + avatarHtml + bubble + '</div>'
+          : '<div class="' + cls + '">' + bubble + '</div>';
+
+        $('#chat-messages').append(row);
+        scrollToBottom();
+      }
+
+      // ── Submit form ──
+      $('#chat-form').on('submit', function (e) {
+        e.preventDefault();
+
+        var $input = $('#message');
+        var $btn   = $('#send-btn');
+        var msg    = $input.val().trim();
+        if (!msg) return;
+
+        // Disable saat kirim
+        $input.prop('disabled', true);
+        $btn.prop('disabled', true);
+
+        // Tampilkan pesan user
+        appendBubble('right', escapeHtml(msg));
+
+        // Tampilkan typing indicator
+        appendBubble('left', '', true);
+
+        // Kirim ke backend
+        $.ajax({
+          url:      '/chat',
+          method:   'POST',
+          dataType: 'json',
+          headers:  { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+          data:     { content: msg },
+          success: function (res) {
+            $('.message.typing').remove();
+            var reply = (res && res.message) ? escapeHtml(res.message) : 'Maaf, format balasan tidak dikenali.';
+            appendBubble('left', reply);
+          },
+          error: function (xhr) {
+            $('.message.typing').remove();
+            var msg = 'Maaf, terjadi kesalahan. Coba beberapa saat lagi.';
+            try {
+              if (xhr.responseJSON && xhr.responseJSON.error) msg = escapeHtml(xhr.responseJSON.error);
+            } catch (ex) {}
+            appendBubble('left', msg);
+          },
+          complete: function () {
+            $input.val('').prop('disabled', false);
+            $btn.prop('disabled', false);
+            $input.focus();
+          }
+        });
+      });
+
+      scrollToBottom();
     });
-  });
-</script>
+  </script>
 </body>
 </html>
