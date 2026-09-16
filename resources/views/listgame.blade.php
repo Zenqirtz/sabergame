@@ -126,7 +126,7 @@
                 <img src="{{ asset('images/logo3.png') }}" alt="PlayStation 3" class="console-logo" />
             </div>
 
-            {{-- Isi: hanya grid game (tidak ada gambar konsol PS3) --}}
+            {{-- Isi: grid game + gambar konsol PS3 di kanan --}}
             <div class="game-section-inner">
                 <div class="games-grid" id="ps3-grid">
                     {{-- Game yang selalu tampil --}}
@@ -138,6 +138,11 @@
                     <img class="extra-game"
                          src="https://upload.wikimedia.org/wikipedia/en/a/a5/Grand_Theft_Auto_V.png"
                          alt="GTA V" title="Grand Theft Auto V" />
+                </div>
+
+                {{-- Gambar konsol PS3 di samping kanan grid --}}
+                <div class="console-side-img">
+                    <img src="{{ asset('images/PS3.png') }}" alt="PlayStation 3 Console" />
                 </div>
             </div>
 
