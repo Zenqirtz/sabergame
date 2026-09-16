@@ -140,9 +140,9 @@
                          alt="GTA V" title="Grand Theft Auto V" />
                 </div>
 
-                {{-- Gambar konsol PS3 di samping kanan grid --}}
+                {{-- Gambar konsol PS3 di samping kanan grid (transparan seperti PS4 device4.png) --}}
                 <div class="console-side-img">
-                    <img src="{{ asset('images/PS3.png') }}" alt="PlayStation 3 Console" />
+                    <img src="{{ asset('images/device3.png') }}" alt="PlayStation 3 Console" />
                 </div>
             </div>
 
