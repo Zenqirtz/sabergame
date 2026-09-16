@@ -85,7 +85,6 @@
     <div id="chat-modal" class="chat-modal" role="dialog" aria-modal="true" aria-label="Chatbot Cibel">
         <div class="chat-modal-backdrop" id="chat-backdrop"></div>
         <div class="chat-modal-content">
-            <button class="chat-modal-close" id="btn-close-chat" aria-label="Tutup chatbot">&#x2715; Tutup</button>
             <iframe src="{{ url('/chatbot') }}" title="Chatbot Cibel" class="chat-modal-iframe" id="chatbot-iframe"></iframe>
         </div>
     </div>
